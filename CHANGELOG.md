@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.6] - 2026-03-08
+
+### Added
+- Auto-resume downloads on startup setting (off by default) in Settings > Downloads
+- Downloaded section in Downloads view showing completed downloads
+- Section navigation buttons (Active, Queue, Downloaded, Failed) with counts and scroll-to
+- Items capped at 10 per section with "and X more..." overflow indicator
+
+### Changed
+- Downloads view redesigned: renamed Pending to Queue, added Downloaded section
+- Pending section renamed to Queue for clarity
+
 ## [0.0.5] - 2026-03-08
 
 ### Added

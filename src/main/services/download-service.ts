@@ -107,10 +107,21 @@ export async function retryFailed(): Promise<void> {
   kickProcessQueue();
 }
 
-function kickProcessQueue(): void {
+export function kickProcessQueue(): void {
   void processQueue().catch((err) => {
     log.error("Queue processor crashed:", err);
   });
+}
+
+export function resumeQueueIfNeeded(): void {
+  const settings = getSettings();
+  if (!settings.autoResumeDownloads) return;
+
+  const queue = getQueue();
+  if (queue.pending.length > 0) {
+    log.info(`Auto-resuming queue with ${queue.pending.length} pending downloads`);
+    kickProcessQueue();
+  }
 }
 
 export function pauseAll(): void {

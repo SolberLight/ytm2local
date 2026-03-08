@@ -41,6 +41,7 @@ export type Config = {
   skipLongTracks: boolean;
   maxTrackDurationSeconds: number;
   deleteMissingFromCache: boolean;
+  autoResumeDownloads: boolean;
   lastOpenedAt: string | null;
 };
 
