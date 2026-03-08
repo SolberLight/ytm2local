@@ -224,6 +224,44 @@ body {
 .badge-not_downloaded { background: rgba(160, 160, 176, 0.15); color: var(--text-secondary); }
 .badge-skipped { background: rgba(160, 160, 176, 0.15); color: var(--text-secondary); }
 
+/* Pagination */
+.pagination-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  margin-top: -1px;
+}
+
+.pagination-info {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-page {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 0 4px;
+  min-width: 90px;
+  text-align: center;
+}
+
+.pagination-controls .btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 /* Auth page */
 .auth-page {
   display: flex;

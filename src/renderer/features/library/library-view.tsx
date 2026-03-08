@@ -4,6 +4,8 @@ import type { LibraryItem, Library } from "../../lib/types";
 type SortKey = "title" | "artist" | "lastSeenAt";
 type SortDir = "asc" | "desc";
 
+const PAGE_SIZE = 50;
+
 export function LibraryView() {
   const [library, setLibrary] = useState<Library | null>(null);
   const [search, setSearch] = useState("");
@@ -12,6 +14,7 @@ export function LibraryView() {
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [syncing, setSyncing] = useState(false);
+  const [page, setPage] = useState(1);
 
   const loadLibrary = async () => {
     const lib = await window.api.library.getAll();
@@ -90,6 +93,15 @@ export function LibraryView() {
     return items;
   }, [library, search, statusFilter, sortKey, sortDir]);
 
+  // Reset to page 1 when filters/sort change
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+  const safeePage = Math.min(page, totalPages);
+  const pagedItems = filteredItems.slice((safeePage - 1) * PAGE_SIZE, safeePage * PAGE_SIZE);
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
     else {
@@ -108,10 +120,16 @@ export function LibraryView() {
   };
 
   const toggleSelectAll = () => {
-    if (selected.size === filteredItems.length) {
-      setSelected(new Set());
+    const pageIds = pagedItems.map((i) => i.id);
+    const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
+    if (allPageSelected) {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const id of pageIds) next.delete(id);
+        return next;
+      });
     } else {
-      setSelected(new Set(filteredItems.map((i) => i.id)));
+      setSelected((prev) => new Set([...prev, ...pageIds]));
     }
   };
 
@@ -176,7 +194,7 @@ export function LibraryView() {
             <th style={{ width: 40 }}>
               <input
                 type="checkbox"
-                checked={filteredItems.length > 0 && selected.size === filteredItems.length}
+                checked={pagedItems.length > 0 && pagedItems.every((i) => selected.has(i.id))}
                 onChange={toggleSelectAll}
               />
             </th>
@@ -193,9 +211,9 @@ export function LibraryView() {
           </tr>
         </thead>
         <tbody>
-          {filteredItems.map((item) => (
+          {pagedItems.map((item, index) => (
             <tr
-              key={item.id}
+              key={`${item.id}-${index}`}
               className={selected.has(item.id) ? "selected" : ""}
               onClick={() => toggleSelect(item.id)}
               style={{ cursor: "pointer" }}
@@ -239,6 +257,47 @@ export function LibraryView() {
           )}
         </tbody>
       </table>
+
+      <div className="pagination-bar">
+        <span className="pagination-info">
+          {filteredItems.length === 0
+            ? "No results"
+            : `${(safeePage - 1) * PAGE_SIZE + 1}\u2013${Math.min(safeePage * PAGE_SIZE, filteredItems.length)} of ${filteredItems.length}`}
+        </span>
+        <div className="pagination-controls">
+          <button
+            className="btn btn-secondary btn-sm"
+            disabled={safeePage <= 1}
+            onClick={() => setPage(1)}
+          >
+            First
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            disabled={safeePage <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            Prev
+          </button>
+          <span className="pagination-page">
+            Page {safeePage} of {totalPages}
+          </span>
+          <button
+            className="btn btn-secondary btn-sm"
+            disabled={safeePage >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Next
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            disabled={safeePage >= totalPages}
+            onClick={() => setPage(totalPages)}
+          >
+            Last
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
