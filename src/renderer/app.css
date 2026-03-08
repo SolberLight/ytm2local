@@ -90,6 +90,30 @@ body {
   border-right: 3px solid var(--accent);
 }
 
+.sidebar-counts {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.sidebar-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sidebar-badge-completed {
+  background: var(--success, #2ea043);
+  color: #fff;
+}
+
+.sidebar-badge-failed {
+  background: var(--danger, #da3633);
+  color: #fff;
+}
+
 .main-content {
   flex: 1;
   overflow-y: auto;
