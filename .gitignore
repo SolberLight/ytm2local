@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+*.log
+.env
+assets/bin/yt-dlp.exe
+assets/bin/ffmpeg.exe
+assets/bin/ffprobe.exe
+cookie.txt
+cookies.txt

@@ -1,0 +1,72 @@
+{
+  "name": "ytm2local",
+  "version": "0.0.1",
+  "main": "dist/main/index.js",
+  "description": "Download your YouTube Music liked songs locally",
+  "scripts": {
+    "dev:renderer": "vite --config vite.config.ts",
+    "dev:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
+    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "dev": "npm run dev:main && concurrently \"npm:dev:renderer\" \"npm:dev:electron\"",
+    "build:renderer": "vite build --config vite.config.ts",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:preload": "tsc -p tsconfig.preload.json",
+    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "electron-log": "^5.4.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
+    "youtubei.js": "^16.0.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "concurrently": "^9.2.1",
+    "electron": "^40.8.0",
+    "electron-builder": "^26.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "wait-on": "^9.0.4"
+  },
+  "build": {
+    "appId": "com.ytm2local.app",
+    "productName": "YTM2Local",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*"
+    ],
+    "icon": "repo_assets/icon",
+    "extraResources": [
+      {
+        "from": "assets/bin/",
+        "to": "bin/",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "repo_assets/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "repo_assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
