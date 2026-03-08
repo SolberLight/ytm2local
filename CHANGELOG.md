@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.2] - 2026-03-08
+
+### Fixed
+- Release workflow quoting for Windows Git Bash runners
+- App icon resized to 256x256 (electron-builder requirement)
+- Added `--publish never` to dist script
+- pauseAll/processQueue race condition via generation counter
+- Login window reject-after-resolve with settled flag
+- saveLibrary now uses correct local reference in enqueueSongs
+- Restored concurrent downloads (removed unnecessary clamp)
+- Use `import type` for Config in settings-ipc
+
 ## [0.0.1] - 2026-03-08
 
 ### Added
