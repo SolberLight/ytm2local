@@ -20,9 +20,9 @@
 
 ## Installation
 
-Download the latest installer from [Releases](../../releases).
+Download the latest installer from [Releases](../../releases) (`.exe` for Windows, `.dmg` for macOS).
 
-Run the setup wizard and launch YTM2Local from your Start Menu or Desktop.
+Run the installer and launch YTM2Local.
 
 ## Build from Source
 
@@ -34,14 +34,20 @@ cd ytm2local
 npm install
 ```
 
-Place `yt-dlp.exe`, `ffmpeg.exe`, and `ffprobe.exe` in `assets/bin/`.
+Download the required binaries (yt-dlp, ffmpeg, ffprobe) for your platform:
+
+```bash
+bash scripts/setup-bins.sh
+```
+
+Or place them manually in `assets/bin/` (`.exe` on Windows, no extension on macOS/Linux).
 
 ```bash
 npm run build     # compile TypeScript + bundle renderer
 npm run dist      # package installer with electron-builder
 ```
 
-The installer will be output to the `release/` directory.
+The installer (`.exe` on Windows, `.dmg` on macOS) will be output to the `release/` directory.
 
 ### Development
 
