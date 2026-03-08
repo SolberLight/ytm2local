@@ -129,15 +129,12 @@ async function processQueue(): Promise<void> {
 
   try {
     const settings = getSettings();
-    // TODO: implement mutex for concurrent downloads
-    const concurrency = Math.min(settings.concurrency, 1);
-
     while (isProcessing) {
       const queue = getQueue();
       if (queue.pending.length === 0) break;
 
       // Take up to `concurrency` jobs
-      const batch = queue.pending.splice(0, concurrency);
+      const batch = queue.pending.splice(0, settings.concurrency);
       queue.active.push(...batch.map((j) => ({ ...j, status: "active" as const })));
       await saveQueue(queue);
 
