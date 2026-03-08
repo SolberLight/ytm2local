@@ -17,6 +17,7 @@ import log from "electron-log/main";
 
 let isProcessing = false;
 let abortController: AbortController | null = null;
+let runGeneration = 0;
 
 function sendToRenderer(channel: string, ...args: unknown[]) {
   const win = BrowserWindow.getAllWindows()[0];
@@ -68,7 +69,7 @@ export async function enqueueSongs(songIds: string[]): Promise<void> {
   }
 
   await saveQueue(queue);
-  await saveLibrary(getLibrary());
+  await saveLibrary(library);
 
   log.info(`Enqueued ${added} songs for download`);
   sendToRenderer("download:queued", { count: added });
@@ -115,9 +116,8 @@ function kickProcessQueue(): void {
 export function pauseAll(): void {
   if (abortController) {
     abortController.abort();
-    abortController = null;
   }
-  isProcessing = false;
+  runGeneration++;
   log.info("Downloads paused");
 }
 
@@ -125,16 +125,19 @@ async function processQueue(): Promise<void> {
   if (isProcessing) return;
   isProcessing = true;
   abortController = new AbortController();
+  const myGeneration = ++runGeneration;
 
   try {
     const settings = getSettings();
+    // TODO: implement mutex for concurrent downloads
+    const concurrency = Math.min(settings.concurrency, 1);
 
     while (isProcessing) {
       const queue = getQueue();
       if (queue.pending.length === 0) break;
 
       // Take up to `concurrency` jobs
-      const batch = queue.pending.splice(0, settings.concurrency);
+      const batch = queue.pending.splice(0, concurrency);
       queue.active.push(...batch.map((j) => ({ ...j, status: "active" as const })));
       await saveQueue(queue);
 
@@ -145,8 +148,10 @@ async function processQueue(): Promise<void> {
       await Promise.allSettled(promises);
     }
   } finally {
-    isProcessing = false;
-    abortController = null;
+    if (myGeneration === runGeneration) {
+      isProcessing = false;
+      abortController = null;
+    }
   }
 }
 

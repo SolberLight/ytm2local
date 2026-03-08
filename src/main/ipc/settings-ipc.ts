@@ -2,7 +2,7 @@ import { ipcMain, dialog, shell } from "electron";
 import { getSettings, updateSettings } from "../services/settings-service";
 import { getLogContents } from "../services/log-service";
 import { getUserDataPath } from "../utils/paths";
-import { Config } from "../utils/schema";
+import type { Config } from "../utils/schema";
 import log from "electron-log/main";
 
 export function registerSettingsIpc(): void {

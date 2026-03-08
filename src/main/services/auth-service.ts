@@ -70,6 +70,8 @@ async function extractSessionCookies(): Promise<string> {
 // Open a BrowserWindow for the user to sign into YouTube Music
 export function openLoginWindow(): Promise<string> {
   return new Promise((resolve, reject) => {
+    let settled = false;
+
     const loginWin = new BrowserWindow({
       width: 500,
       height: 700,
@@ -91,9 +93,11 @@ export function openLoginWindow(): Promise<string> {
         try {
           const cookieStr = await extractSessionCookies();
           log.info(`Extracted ${cookieStr.split(";").length} cookies from login session`);
+          settled = true;
           loginWin.close();
           resolve(cookieStr);
         } catch (err) {
+          settled = true;
           loginWin.close();
           reject(err);
         }
@@ -101,7 +105,7 @@ export function openLoginWindow(): Promise<string> {
     });
 
     loginWin.on("closed", () => {
-      reject(new Error("Login window closed before completing sign-in."));
+      if (!settled) reject(new Error("Login window closed before completing sign-in."));
     });
   });
 }
