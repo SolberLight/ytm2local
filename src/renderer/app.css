@@ -368,6 +368,13 @@ body {
   font-size: 13px;
 }
 
+.queue-more {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
 /* Logs */
 .log-viewer {
   background: var(--bg-secondary);

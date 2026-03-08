@@ -13,6 +13,7 @@ export const ConfigSchema = z.object({
   skipLongTracks: z.boolean(),
   maxTrackDurationSeconds: z.number().int().min(60),
   deleteMissingFromCache: z.boolean(),
+  autoResumeDownloads: z.boolean(),
   lastOpenedAt: z.string().nullable(),
 });
 
@@ -29,6 +30,7 @@ export const DEFAULT_CONFIG: Config = {
   skipLongTracks: true,
   maxTrackDurationSeconds: 600,
   deleteMissingFromCache: false,
+  autoResumeDownloads: false,
   lastOpenedAt: null,
 };
 

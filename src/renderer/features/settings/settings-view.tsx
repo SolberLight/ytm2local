@@ -170,6 +170,14 @@ export function SettingsView({ onLogout }: Props) {
               <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>minutes</span>
             </div>
           </div>
+          <div className="settings-row">
+            <label>Auto-resume downloads on startup</label>
+            <input
+              type="checkbox"
+              checked={config.autoResumeDownloads}
+              onChange={(e) => update({ autoResumeDownloads: e.target.checked })}
+            />
+          </div>
         </div>
 
         <div className="settings-group">

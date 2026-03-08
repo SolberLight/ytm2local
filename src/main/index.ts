@@ -3,6 +3,7 @@ import path from "path";
 import { initLogger } from "./services/log-service";
 import { loadSettings, updateSettings } from "./services/settings-service";
 import { loadLibrary, loadDownloads, loadQueue } from "./services/cache-service";
+import { resumeQueueIfNeeded } from "./services/download-service";
 import { registerAuthIpc } from "./ipc/auth-ipc";
 import { registerLibraryIpc } from "./ipc/library-ipc";
 import { registerDownloadsIpc } from "./ipc/downloads-ipc";
@@ -80,6 +81,9 @@ app.whenReady().then(async () => {
   try {
     await bootstrap();
     await createWindow();
+
+    // Auto-resume pending downloads after startup
+    resumeQueueIfNeeded();
 
     app.on("activate", async () => {
       if (BrowserWindow.getAllWindows().length === 0) {
