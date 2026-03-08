@@ -17,7 +17,16 @@ export async function syncLibrary(): Promise<Library> {
 
   try {
     const provider = await getProvider();
-    const likedSongs = await provider.getLikedSongs();
+    const rawLikedSongs = await provider.getLikedSongs();
+
+    // Deduplicate by videoId (API pagination can return overlapping results)
+    const seenVideoIds = new Set<string>();
+    const likedSongs = rawLikedSongs.filter((s) => {
+      if (seenVideoIds.has(s.videoId)) return false;
+      seenVideoIds.add(s.videoId);
+      return true;
+    });
+
     const library = getLibrary();
     const settings = getSettings();
     const now = new Date().toISOString();
