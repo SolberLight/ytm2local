@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.4] - 2026-03-08
+
+### Fixed
+- Library search/filter returning wrong results due to duplicate React keys
+- Duplicate songs appearing in library from YouTube Music API pagination overlap
+- Deduplicate liked songs by videoId during sync
+
+### Added
+- Pagination on library table (50 songs per page) for better performance
+- Sticky pagination bar with First/Prev/Next/Last navigation and item count
+- Select-all checkbox now operates on current page only
+
+### Changed
+- `/pr` skill now always bumps version and updates changelog before creating PR
+
 ## [0.0.3] - 2026-03-08
 
 ### Added
