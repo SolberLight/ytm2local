@@ -1,6 +1,6 @@
 {
   "name": "ytm2local",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/main/index.js",
   "description": "Download your YouTube Music liked songs locally",
   "scripts": {
