@@ -33,7 +33,8 @@ export function registerSettingsIpc(): void {
   });
 
   ipcMain.handle("settings:openAppData", async () => {
-    shell.openPath(getUserDataPath());
+    const err = await shell.openPath(getUserDataPath());
+    if (err) throw new Error(err);
   });
 
   ipcMain.handle("diagnostics:getLogs", async () => {

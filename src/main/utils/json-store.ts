@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { randomUUID } from "crypto";
 import { z } from "zod";
 import log from "electron-log/main";
 
@@ -40,7 +41,7 @@ export async function saveJsonAtomic(
 
   const tmpPath = path.join(
     dir,
-    `.${path.basename(filePath)}.tmp-${process.pid}`
+    `.${path.basename(filePath)}.tmp-${process.pid}-${randomUUID()}`
   );
 
   const json = JSON.stringify(data, null, 2);
@@ -63,6 +64,10 @@ export async function updateJson<T>(
 ): Promise<T> {
   const current = await loadJson(filePath, schema, fallback);
   const updated = updater(current);
-  await saveJsonAtomic(filePath, updated);
-  return updated;
+  const result = schema.safeParse(updated);
+  if (!result.success) {
+    throw new Error(`Invalid data for ${filePath}: ${result.error.message}`);
+  }
+  await saveJsonAtomic(filePath, result.data);
+  return result.data;
 }

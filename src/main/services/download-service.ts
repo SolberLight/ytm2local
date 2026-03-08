@@ -73,7 +73,7 @@ export async function enqueueSongs(songIds: string[]): Promise<void> {
   log.info(`Enqueued ${added} songs for download`);
   sendToRenderer("download:queued", { count: added });
 
-  processQueue();
+  kickProcessQueue();
 }
 
 export async function enqueueNewSongs(): Promise<void> {
@@ -103,7 +103,13 @@ export async function retryFailed(): Promise<void> {
   await saveQueue(queue);
   await saveLibrary(library);
 
-  processQueue();
+  kickProcessQueue();
+}
+
+function kickProcessQueue(): void {
+  void processQueue().catch((err) => {
+    log.error("Queue processor crashed:", err);
+  });
 }
 
 export function pauseAll(): void {
@@ -120,26 +126,28 @@ async function processQueue(): Promise<void> {
   isProcessing = true;
   abortController = new AbortController();
 
-  const settings = getSettings();
+  try {
+    const settings = getSettings();
 
-  while (isProcessing) {
-    const queue = getQueue();
-    if (queue.pending.length === 0) break;
+    while (isProcessing) {
+      const queue = getQueue();
+      if (queue.pending.length === 0) break;
 
-    // Take up to `concurrency` jobs
-    const batch = queue.pending.splice(0, settings.concurrency);
-    queue.active.push(...batch.map((j) => ({ ...j, status: "active" as const })));
-    await saveQueue(queue);
+      // Take up to `concurrency` jobs
+      const batch = queue.pending.splice(0, settings.concurrency);
+      queue.active.push(...batch.map((j) => ({ ...j, status: "active" as const })));
+      await saveQueue(queue);
 
-    // Process batch in parallel
-    const promises = batch.map((job) =>
-      downloadSong(job, abortController!.signal)
-    );
-    await Promise.allSettled(promises);
+      // Process batch in parallel
+      const promises = batch.map((job) =>
+        downloadSong(job, abortController!.signal)
+      );
+      await Promise.allSettled(promises);
+    }
+  } finally {
+    isProcessing = false;
+    abortController = null;
   }
-
-  isProcessing = false;
-  abortController = null;
 }
 
 async function downloadSong(
@@ -153,7 +161,10 @@ async function downloadSong(
 
   const item = library.items.find((i) => i.id === job.songId);
   if (!item) {
-    log.warn(`Song not found for job ${job.id}`);
+    log.warn(`Song not found for job ${job.id}, removing from active`);
+    queue.active = queue.active.filter((j) => j.id !== job.id);
+    await saveQueue(queue);
+    sendToRenderer("download:failed", { songId: job.songId, error: "Song not found in library" });
     return;
   }
 
@@ -191,6 +202,15 @@ async function downloadSong(
   const maxAttempts = 2;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (signal.aborted) {
+      // Paused — return job to pending without counting as failure
+      item.downloadStatus = "queued";
+      queue.active = queue.active.filter((j) => j.id !== job.id);
+      queue.pending.unshift({ ...job, status: "pending" });
+      await Promise.all([saveLibrary(library), saveQueue(queue)]);
+      return;
+    }
+
     job.attempts++;
 
     try {
@@ -237,10 +257,26 @@ async function downloadSong(
         return;
       }
 
+      // If aborted mid-download, don't count as failure
+      if (signal.aborted) {
+        item.downloadStatus = "queued";
+        queue.active = queue.active.filter((j) => j.id !== job.id);
+        queue.pending.unshift({ ...job, status: "pending" });
+        await Promise.all([saveLibrary(library), saveQueue(queue)]);
+        return;
+      }
+
       log.warn(
         `yt-dlp failed for ${item.videoId} (attempt ${attempt + 1}): exit ${result.code}\n${result.stderr}`
       );
     } catch (err) {
+      if (signal.aborted) {
+        item.downloadStatus = "queued";
+        queue.active = queue.active.filter((j) => j.id !== job.id);
+        queue.pending.unshift({ ...job, status: "pending" });
+        await Promise.all([saveLibrary(library), saveQueue(queue)]);
+        return;
+      }
       log.error(`Download error for ${item.videoId} (attempt ${attempt + 1}):`, err);
     }
   }

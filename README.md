@@ -29,7 +29,7 @@ Run the setup wizard and launch YTM2Local from your Start Menu or Desktop.
 **Prerequisites:** Node.js 18+, Git
 
 ```bash
-git clone https://github.com/your-username/ytm2local.git
+git clone https://github.com/SolberLight/ytm2local
 cd ytm2local
 npm install
 ```

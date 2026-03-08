@@ -5,8 +5,12 @@ export function LogsView() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const loadLogs = async () => {
-    const content = await window.api.diagnostics.getLogs();
-    setLogs(content);
+    try {
+      const content = await window.api.diagnostics.getLogs();
+      setLogs(content);
+    } catch {
+      setLogs("Failed to load logs.");
+    }
     // Scroll to bottom
     setTimeout(() => {
       if (containerRef.current) {

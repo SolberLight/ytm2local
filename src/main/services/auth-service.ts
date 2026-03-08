@@ -36,8 +36,11 @@ async function loadAuth(): Promise<string | null> {
 
   if (auth.encrypted && isEncryptionAvailable()) {
     cachedCookies = decrypt(auth.ciphertextBase64);
-  } else {
+  } else if (!auth.encrypted) {
     cachedCookies = auth.ciphertextBase64;
+  } else {
+    log.warn("Auth is encrypted but decryption is unavailable");
+    return null;
   }
 
   return cachedCookies;

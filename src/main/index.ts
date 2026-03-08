@@ -77,14 +77,19 @@ async function bootstrap(): Promise<void> {
 }
 
 app.whenReady().then(async () => {
-  await bootstrap();
-  await createWindow();
+  try {
+    await bootstrap();
+    await createWindow();
 
-  app.on("activate", async () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      await createWindow();
-    }
-  });
+    app.on("activate", async () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        await createWindow();
+      }
+    });
+  } catch (err: unknown) {
+    log.error("Startup failed", err);
+    app.quit();
+  }
 });
 
 app.on("window-all-closed", () => {

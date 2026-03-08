@@ -41,10 +41,14 @@ export function getBinDir(): string {
   return path.join(app.getAppPath(), "assets", "bin");
 }
 
+function getBinaryName(baseName: string): string {
+  return process.platform === "win32" ? `${baseName}.exe` : baseName;
+}
+
 export function getYtDlpPath(): string {
-  return path.join(getBinDir(), "yt-dlp.exe");
+  return path.join(getBinDir(), getBinaryName("yt-dlp"));
 }
 
 export function getFfmpegPath(): string {
-  return path.join(getBinDir(), "ffmpeg.exe");
+  return path.join(getBinDir(), getBinaryName("ffmpeg"));
 }

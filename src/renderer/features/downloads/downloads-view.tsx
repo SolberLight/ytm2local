@@ -7,22 +7,26 @@ export function DownloadsView() {
   const [progress, setProgress] = useState<Record<string, string>>({});
 
   const load = async () => {
-    const [q, lib] = await Promise.all([
-      window.api.downloads.getQueue(),
-      window.api.library.getAll(),
-    ]);
-    setQueue(q);
-    setLibrary(lib);
+    try {
+      const [q, lib] = await Promise.all([
+        window.api.downloads.getQueue(),
+        window.api.library.getAll(),
+      ]);
+      setQueue(q);
+      setLibrary(lib);
+    } catch (err) {
+      console.error("Failed to load download queue:", err);
+    }
   };
 
   useEffect(() => {
     load();
 
     const unsubs = [
-      window.api.on("download:queued", load),
-      window.api.on("download:started", load),
-      window.api.on("download:finished", load),
-      window.api.on("download:failed", load),
+      window.api.on("download:queued", () => { void load(); }),
+      window.api.on("download:started", () => { void load(); }),
+      window.api.on("download:finished", () => { void load(); }),
+      window.api.on("download:failed", () => { void load(); }),
       window.api.on("download:progress", (data: unknown) => {
         const d = data as { songId: string; line: string };
         setProgress((prev) => ({ ...prev, [d.songId]: d.line }));

@@ -27,10 +27,20 @@ export function runProcess(
     stdio: ["ignore", "pipe", "pipe"],
   });
 
-  if (options?.abortSignal) {
-    options.abortSignal.addEventListener("abort", () => {
+  const signal = options?.abortSignal;
+  if (signal) {
+    const onAbort = () => {
       child.kill("SIGTERM");
-    });
+    };
+
+    if (signal.aborted) {
+      onAbort();
+    } else {
+      signal.addEventListener("abort", onAbort, { once: true });
+      child.once("close", () => {
+        signal.removeEventListener("abort", onAbort);
+      });
+    }
   }
 
   const stdoutChunks: string[] = [];

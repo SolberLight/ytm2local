@@ -12,9 +12,14 @@ export function App() {
   const [currentPage, setCurrentPage] = useState<Page>("library");
 
   useEffect(() => {
-    window.api.auth.status().then((status) => {
-      setIsAuthenticated(status.isAuthenticated);
-    });
+    window.api.auth
+      .status()
+      .then((status) => {
+        setIsAuthenticated(status.isAuthenticated);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      });
   }, []);
 
   if (isAuthenticated === null) {

@@ -13,12 +13,17 @@ export function AuthPage({ onAuthenticated }: Props) {
   const handleBrowserLogin = async () => {
     setLoading(true);
     setError(null);
-    const result = await window.api.auth.browserLogin();
-    setLoading(false);
-    if (result.success) {
-      onAuthenticated();
-    } else {
-      setError(result.error || "Login failed.");
+    try {
+      const result = await window.api.auth.browserLogin();
+      if (result.success) {
+        onAuthenticated();
+      } else {
+        setError(result.error || "Login failed.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,12 +34,17 @@ export function AuthPage({ onAuthenticated }: Props) {
     }
     setLoading(true);
     setError(null);
-    const result = await window.api.auth.import(cookies.trim());
-    setLoading(false);
-    if (result.success) {
-      onAuthenticated();
-    } else {
-      setError(result.error || "Authentication failed.");
+    try {
+      const result = await window.api.auth.import(cookies.trim());
+      if (result.success) {
+        onAuthenticated();
+      } else {
+        setError(result.error || "Authentication failed.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed.");
+    } finally {
+      setLoading(false);
     }
   };
 

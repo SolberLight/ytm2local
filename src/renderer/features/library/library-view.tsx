@@ -34,7 +34,12 @@ export function LibraryView() {
 
   const handleSync = async () => {
     setSyncing(true);
-    await window.api.library.sync();
+    try {
+      await window.api.library.sync();
+    } catch (err) {
+      console.error("Sync failed:", err);
+      setSyncing(false);
+    }
   };
 
   const handleDownloadSelected = async () => {
