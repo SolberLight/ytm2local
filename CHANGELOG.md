@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.3] - 2026-03-08
+
+### Added
+- Theme skin system with 6 switchable UI skins (Default, Midnight Ember, Cyber Neon, Aurora Borealis, Vinyl Noir, Tokyo Sakura)
+- Visual skin picker in Settings with live preview cards
+- ThemeContext with CSS variable injection and per-theme custom CSS
+- Theme selection persisted in localStorage
+- Each skin transforms colors, typography, borders, animations, shadows, and effects
+
+### Changed
+- Midnight Ember is now the default theme
+- Settings grid max-width increased to 700px for skin picker layout
+
 ## [0.0.2] - 2026-03-08
 
 ### Fixed

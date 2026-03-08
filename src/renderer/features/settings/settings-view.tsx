@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Config } from "../../lib/types";
+import { useTheme } from "../../themes/theme-context";
 
 interface Props {
   onLogout: () => void;
@@ -8,6 +9,7 @@ interface Props {
 export function SettingsView({ onLogout }: Props) {
   const [config, setConfig] = useState<Config | null>(null);
   const [saved, setSaved] = useState(false);
+  const { currentTheme, setTheme, themes } = useTheme();
 
   useEffect(() => {
     window.api.settings.get().then(setConfig);
@@ -42,6 +44,54 @@ export function SettingsView({ onLogout }: Props) {
       </div>
 
       <div className="settings-grid">
+        {/* Skin Selector - Featured at the top */}
+        <div className="settings-group">
+          <h3>Skin</h3>
+          <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 14, marginTop: -4 }}>
+            Transform the entire look and feel of the app
+          </p>
+          <div className="skin-grid">
+            {themes.map((theme) => (
+              <button
+                key={theme.id}
+                className={`skin-card ${currentTheme.id === theme.id ? "skin-card-active" : ""}`}
+                onClick={() => setTheme(theme.id)}
+              >
+                <div className="skin-preview">
+                  <div
+                    className="skin-preview-bg"
+                    style={{ background: theme.preview.bg }}
+                  >
+                    <div className="skin-preview-sidebar" style={{ background: `color-mix(in srgb, ${theme.preview.bg} 70%, white 10%)` }}>
+                      <div className="skin-preview-dot" style={{ background: theme.preview.accent }} />
+                      <div className="skin-preview-line" style={{ background: `${theme.preview.text}40` }} />
+                      <div className="skin-preview-line" style={{ background: `${theme.preview.text}40` }} />
+                      <div className="skin-preview-line-active" style={{ background: theme.preview.accent, boxShadow: `0 0 6px ${theme.preview.accent}60` }} />
+                      <div className="skin-preview-line" style={{ background: `${theme.preview.text}40` }} />
+                    </div>
+                    <div className="skin-preview-content">
+                      <div className="skin-preview-header" style={{ background: `${theme.preview.text}20` }} />
+                      <div className="skin-preview-rows">
+                        <div className="skin-preview-row" style={{ background: `${theme.preview.text}08` }} />
+                        <div className="skin-preview-row" style={{ background: `${theme.preview.text}05` }} />
+                        <div className="skin-preview-row" style={{ background: `${theme.preview.text}08` }} />
+                      </div>
+                      <div className="skin-preview-btn" style={{ background: theme.preview.accent }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="skin-info">
+                  <span className="skin-name">{theme.name}</span>
+                  <span className="skin-desc">{theme.description}</span>
+                </div>
+                {currentTheme.id === theme.id && (
+                  <div className="skin-active-badge">Active</div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="settings-group">
           <h3>Downloads</h3>
           <div className="settings-row">
