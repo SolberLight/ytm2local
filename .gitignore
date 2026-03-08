@@ -6,5 +6,8 @@ release/
 assets/bin/yt-dlp.exe
 assets/bin/ffmpeg.exe
 assets/bin/ffprobe.exe
+assets/bin/yt-dlp
+assets/bin/ffmpeg
+assets/bin/ffprobe
 cookie.txt
 cookies.txt
