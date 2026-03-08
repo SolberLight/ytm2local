@@ -1,6 +1,6 @@
 {
   "name": "ytm2local",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/main/index.js",
   "description": "Download your YouTube Music liked songs locally",
   "scripts": {
@@ -62,6 +62,10 @@
     "win": {
       "target": "nsis",
       "icon": "repo_assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "repo_assets/icon.png"
     },
     "nsis": {
       "oneClick": false,

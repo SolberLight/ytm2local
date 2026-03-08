@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.5] - 2026-03-08
+
+### Added
+- macOS support: electron-builder `mac` target producing `.dmg`
+- macOS CI builds in GitHub Actions matrix
+- macOS release job in release workflow (parallel Win + Mac builds)
+- `scripts/setup-bins.sh` helper to download platform-appropriate yt-dlp/ffmpeg binaries for local dev
+
+### Changed
+- Release workflow restructured into parallel Win/Mac jobs with a unified publish step
+- `.gitignore` now covers macOS binaries (without `.exe` extension)
+
 ## [0.0.4] - 2026-03-08
 
 ### Fixed
