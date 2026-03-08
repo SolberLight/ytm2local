@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { Queue, Library, Downloads } from "../../lib/types";
 
 const MAX_VISIBLE = 10;
@@ -13,21 +13,24 @@ export function DownloadsView() {
   const pendingRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef<HTMLDivElement>(null);
   const failedRef = useRef<HTMLDivElement>(null);
+  const loadGenRef = useRef(0);
 
-  const load = async () => {
+  const load = useCallback(async () => {
+    const gen = ++loadGenRef.current;
     try {
       const [q, lib, dl] = await Promise.all([
         window.api.downloads.getQueue(),
         window.api.library.getAll(),
         window.api.downloads.getDownloads(),
       ]);
+      if (gen !== loadGenRef.current) return; // stale response
       setQueue(q);
       setLibrary(lib);
       setDownloads(dl);
     } catch (err) {
       console.error("Failed to load download queue:", err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
@@ -44,7 +47,7 @@ export function DownloadsView() {
     ];
 
     return () => unsubs.forEach((u) => u());
-  }, []);
+  }, [load]);
 
   const songTitle = (songId: string) => {
     return library?.items.find((i) => i.id === songId)?.title || songId;
